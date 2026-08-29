@@ -1,0 +1,64 @@
+let mapleader = "\<Space>"
+
+" Insert mode key bindings
+imap jj <Esc>
+imap ;; <C-n>
+
+" Normal mode key bindings (non-recursive)
+nnoremap <Esc><Esc> :noh<CR>
+nnoremap n nzz
+nnoremap N Nzz
+nnoremap * *zz
+nnoremap # #zz
+nnoremap Y y$
+nnoremap H ^
+nnoremap L $
+nnoremap K i<CR><Esc>
+nnoremap U <C-r>
+nnoremap <leader>a ggvG
+nnoremap <leader>p` "_di`P
+nnoremap <leader>p' "_di'P
+nnoremap <leader>p" "_di"P
+nnoremap <leader>p) "_di)P
+nnoremap <leader>p] "_di]P
+nnoremap <leader>p} "_di}P
+nnoremap <leader>p> "_di>P
+
+" Visual mode key bindings (non-recursive)
+"vnoremap p "_dP
+vnoremap p pgvy
+vnoremap H ^
+vnoremap L $
+vnoremap <leader>j J
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Operator pending mode key bindings (when y, d or c is pressed)
+omap ` i`
+omap ' i'
+omap " i"
+omap ) i)
+omap ] i]
+omap } i}
+
+" Vim settings
+set number
+set shiftwidth=0
+set softtabstop=4
+set tabstop=4
+set expandtab
+set smartindent
+set ignorecase
+set smartcase
+set cursorline
+set ruler
+set showcmd
+set laststatus=2
+set title
+set mouse=a
+set hlsearch
+set incsearch
+set wrapscan
+set clipboard+=unnamed
+hi Search ctermfg=0 ctermbg=187
+syntax enable
