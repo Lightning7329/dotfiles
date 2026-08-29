@@ -12,7 +12,15 @@
 {{- if eq $profile "container" -}}
 {{-   $mode = "file" -}}
 {{- end -}}
+{{- $name := "" -}}
+{{- $email := "" -}}
+{{- if ne $profile "container" -}}
+{{-   $name = promptStringOnce . "name" "Git user name" -}}
+{{-   $email = promptStringOnce . "email" "Git email address" -}}
+{{- end -}}
 mode = {{ $mode | quote }}
 
 [data]
-    profile = {{ $profile | quote }}
+	profile = {{ $profile | quote }}
+	name = {{ $name | quote }}
+	email = {{ $email | quote }}

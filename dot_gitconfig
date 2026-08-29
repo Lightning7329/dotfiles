@@ -1,0 +1,24 @@
+[core]
+	excludesfile = ~/.gitignore_global
+[alias]
+	graph = log --oneline --abbrev-commit --all --graph
+	logl = log --oneline
+	logs = log --compact-summary
+	diffs = diff --cached
+	diffp = diff HEAD~ HEAD
+	co = checkout
+	sw = switch
+	fp = push --force-with-lease --force-if-includes
+	pu = push -u origin HEAD
+	mix = commit --amend --no-edit
+	unstage = restore --staged
+	fetchp = fetch --prune
+[rebase]
+	autoStash = true
+[pull]
+	rebase = true
+[init]
+	defaultBranch = main
+[include]
+	path = ~/.config/git/user.conf
+	path = ~/.config/git/darwin.conf

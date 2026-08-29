@@ -2,9 +2,15 @@
 # macOS 以外では macOS 固有のものを配らない
 .zsh/darwin.zsh
 .zprofile
+.config/git/darwin.conf
 {{- end -}}
 
 {{- if eq .chezmoi.os "darwin" -}}
 # macOS では Linux 固有のものを配らない
 .zsh/linux.zsh
+{{- end -}}
+
+{{- if eq .profile "container" -}}
+# Dev Container はホストの gitconfig を引き継ぐため不要
+.config/git/user.conf
 {{- end }}
