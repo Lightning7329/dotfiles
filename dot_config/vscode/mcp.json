@@ -1,0 +1,42 @@
+{
+	"servers": {
+		"better-auth-documentation": {
+			"type": "http",
+			"url": "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp"
+		},
+		"aws-documentation": {
+			"command": "uvx",
+			"args": ["awslabs.aws-documentation-mcp-server@latest"],
+			"env": {
+				"FASTMCP_LOG_LEVEL": "${input:log_level}",
+				"AWS_DOCUMENTATION_PARTITION": "${input:partition}"
+			},
+			"type": "stdio"
+		},
+		"aws-knowledge": {
+			"url": "https://knowledge-mcp.global.api.aws",
+			"type": "http"
+		},
+		"aws-terraform": {
+			"command": "uvx",
+			"args": ["awslabs.terraform-mcp-server@latest"],
+			"env": {
+				"FASTMCP_LOG_LEVEL": "ERROR"
+			},
+			"disabled": false,
+			"autoApprove": []
+		}
+	},
+	"inputs": [
+		{
+			"id": "log_level",
+			"type": "promptString",
+			"description": "FASTMCP_LOG_LEVEL (DEBUG, INFO, WARNING, ERROR, CRITICAL)"
+		},
+		{
+			"id": "partition",
+			"type": "promptString",
+			"description": "AWS_DOCUMENTATION_PARTITION (aws or aws-cn)"
+		}
+	]
+}

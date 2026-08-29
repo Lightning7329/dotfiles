@@ -1,0 +1,116 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+  {
+    "key": "f",
+    "command": "explorer.newFile",
+    "when": "explorerViewletVisible && !explorerResourceReadonly && !inputFocus",
+  },
+  {
+    "key": "d",
+    "command": "explorer.newFolder",
+    "when": "explorerViewletVisible && !explorerResourceReadonly && !inputFocus",
+  },
+  {
+    "key": "cmd+n",
+    "command": "-workbench.action.files.newUntitledFile",
+  },
+  {
+    "key": "ctrl+'",
+    "command": "workbench.action.terminal.toggleTerminal",
+    "when": "terminal.active",
+  },
+  {
+    "key": "ctrl+`",
+    "command": "-workbench.action.terminal.toggleTerminal",
+    "when": "terminal.active",
+  },
+  {
+    "key": "ctrl+d",
+    "command": "extension.vim_ctrl+d",
+    "when": "editorTextFocus && vim.active && vim.use<C-d> && !inDebugRepl && vim.mode != 'Insert'",
+  },
+  {
+    "key": "ctrl+d",
+    "command": "-extension.vim_ctrl+d",
+    "when": "editorTextFocus && vim.active && vim.use<C-d> && !inDebugRepl",
+  },
+  {
+    "key": "ctrl+e",
+    "command": "extension.vim_ctrl+e",
+    "when": "editorTextFocus && vim.active && vim.use<C-e> && !inDebugRepl && vim.mode != 'Insert'",
+  },
+  {
+    "key": "ctrl+e",
+    "command": "-extension.vim_ctrl+e",
+    "when": "editorTextFocus && vim.active && vim.use<C-e> && !inDebugRepl",
+  },
+  {
+    "key": "ctrl+a",
+    "command": "extension.vim_ctrl+a",
+    "when": "editorTextFocus && vim.active && vim.use<C-a> && !inDebugRepl && vim.mode != 'Insert'",
+  },
+  {
+    "key": "ctrl+a",
+    "command": "-extension.vim_ctrl+a",
+    "when": "editorTextFocus && vim.active && vim.use<C-a> && !inDebugRepl",
+  },
+  {
+    "key": "ctrl+n",
+    "command": "-extension.vim_ctrl+n",
+    "when": "editorTextFocus && vim.active && vim.use<C-n> && !inDebugRepl || vim.active && vim.use<C-n> && !inDebugRepl && vim.mode == 'CommandlineInProgress' || vim.active && vim.use<C-n> && !inDebugRepl && vim.mode == 'SearchInProgressMode'",
+  },
+  {
+    "key": "cmd+j",
+    "command": "workbench.action.togglePanel",
+  },
+  {
+    "key": "cmd+j",
+    "command": "-workbench.action.togglePanel",
+  },
+  {
+    "key": "cmd+d",
+    "command": "-extension.vim_cmd+d",
+    "when": "editorTextFocus && vim.active && vim.use<D-d> && !inDebugRepl",
+  },
+  {
+    "key": "ctrl+alt+down",
+    "command": "gotoNextPreviousMember.nextMember",
+  },
+  {
+    "key": "ctrl+down",
+    "command": "-gotoNextPreviousMember.nextMember",
+  },
+  {
+    "key": "ctrl+alt+up",
+    "command": "gotoNextPreviousMember.previousMember",
+  },
+  {
+    "key": "ctrl+up",
+    "command": "-gotoNextPreviousMember.previousMember",
+  },
+  {
+    "key": "alt+b",
+    "command": "-extension.toggleBool",
+    "when": "editorTextFocus",
+  },
+  {
+    "key": "alt+\\",
+    "command": "aws.amazonq.invokeInlineCompletion",
+    "when": "aws.codewhisperer.connected && editorTextFocus || editorTextFocus && isCloud9",
+  },
+  {
+    "key": "alt+c",
+    "command": "-aws.amazonq.invokeInlineCompletion",
+    "when": "aws.codewhisperer.connected && editorTextFocus || editorTextFocus && isCloud9",
+  },
+  {
+    "key": "ctrl+p",
+    "command": "-extension.vim_ctrl+p",
+    "when": "editorTextFocus && vim.active && vim.use<C-p> && !inDebugRepl || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'CommandlineInProgress' || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'SearchInProgressMode'",
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "github.copilot.chat.openSuggestionsPanel",
+    "when": "editorFocus && inlineSuggestionVisible",
+  },
+]

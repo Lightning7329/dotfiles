@@ -1,0 +1,565 @@
+{
+    // ---------- Language ----------
+    "[javascript][javascriptreact][typescript][typescriptreact]": {
+        // インデント幅を2にする
+        "editor.tabSize": 2
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.tabSize": 4
+    },
+    // F#
+    "FSharp.inlayHints.parameterNames": false,
+    "FSharp.smartIndent": true,
+    "FSharp.codeLenses.references.enabled": false,
+    "[fsharp]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "Ionide.Ionide-fsharp",
+    },
+    // MARK: Python
+    "[python]": {
+        "editor.formatOnType": true,
+    },
+    "python.analysis.extraPaths": [
+        "/Users/trevelyan1103/Documents/Programming/Python/WebScraping/public_facility_scraping"
+    ],
+    "python.analysis.autoFormatStrings": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.terminal.shellIntegration.enabled": true,
+    "python.analysis.includeAliasesFromUserFiles": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.pytestParameters": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.analysis.supportAllPythonDocuments": true,
+    "jupyter.askForKernelRestart": false,
+    "notebook.lineNumbers": "on",
+    "notebook.cellToolbarVisibility": "hover",
+    "notebook.cellFocusIndicator": "border",
+    "notebook.output.scrolling": true,
+    "notebook.output.textLineLimit": 20,
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "right"
+    },
+    "notebook.find.filters": {
+        "markupSource": true,
+        "markupPreview": true,
+        "codeSource": true,
+        "codeOutput": true
+    },
+    "notebook.stickyScroll.enabled": true,
+    // MARK: Git
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+        "scminput": false
+    },
+    "git.autofetch": true,
+    "git.closeDiffOnOperation": true,
+    "git.enableSmartCommit": false,
+    "git.pruneOnFetch": true,
+    "git.blame.editorDecoration.enabled": true,
+    "git.blame.statusBarItem.enabled": true,
+    "git-log--graph.row-height": 25,
+    "scm.defaultViewMode": "tree",
+    "chat.mcp.gallery.enabled": true,
+    "chat.viewSessions.orientation": "stacked",
+    "claudeCode.preferredLocation": "panel",
+    // MARK: Workbench
+    "workbench.settings.editor": "json",
+    "workbench.colorTheme": "Dark+",
+    "workbench.colorCustomizations": {
+        "[Pink Candy Dark]": {
+            "editor.selectionBackground": "#7fe0fe51",
+            "editor.selectionForeground": "#180c0c",
+            "editor.selectionHighlightBackground": "#ff000055",
+            "git.blame.editorDecorationForeground": "#4e6e62",
+        },
+        "[Everforest Dark]": {
+            "editor.wordHighlightBackground": "#51d9bc62",
+            "editor.wordHighlightTextBackground": "#acf76032",
+            "editor.lineHighlightBackground": "#90804937",
+            "editor.lineHighlightBorder": "#707e653d",
+            "editor.selectionBackground": "#4a6065a7",
+            "editor.foldBackground": "#464d5572",
+            "editorLineNumber.activeForeground": "#df6a3c",
+            "activityBar.activeBackground": "#434a3f",
+            "activityBar.activeBorder": "#a6c999",
+            "tab.activeBackground": "#454d48",
+            "tab.hoverBackground": "#4e5551",
+            "statusBar.foreground": "#ffffff",
+            "statusBar.background": "#3c5f7a",
+            "statusBarItem.remoteForeground": "#ffffff",
+            "statusBarItem.remoteBackground": "#6ca5ad",
+            "gitDecoration.untrackedResourceForeground": "#51845f",
+            "gitDecoration.modifiedResourceForeground": "#cfbb8a",
+            "gitDecoration.conflictingResourceForeground": "#993939",
+            "gitDecoration.ignoredResourceForeground": "#596e7b"
+        },
+        "[soft sight]": {
+            "editor.lineHighlightBackground": "#374b5f78",
+            "editor.selectionBackground": "#ffbb0070",
+            "editor.selectionHighlightBackground": "#44e99139",
+            "tab.activeBackground": "#4d504e"
+        },
+        "editorCursor.foreground": "#fa9d1c",
+        "terminalCursor.foreground": "#9dc90d"
+    },
+    "workbench.secondarySideBar.showLabels": false,
+    "workbench.experimental.modernUI": false,
+    // MARK: Editor
+    "editor.minimap.showSlider": "always",
+    "editor.minimap.renderCharacters": true,
+    "editor.lineNumbers": "relative",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.cursorBlinking": "phase",
+    "editor.smoothScrolling": true,
+    "editor.stickyScroll.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "editor.inlineSuggest.syntaxHighlightingEnabled": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.experimental.useTrueInlineView": true,
+    "diffEditor.renderSideBySide": true,
+    "diffEditor.useInlineViewWhenSpaceIsLimited": true,
+    "debug.showVariableTypes": true,
+    "debug.toolBarLocation": "commandCenter",
+    "debugpy.showPythonInlineValues": true,
+    // MARK: Files
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.trimFinalNewlines": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.venv/[lL]ib": true,
+    },
+    "search.exclude": {
+        "**/.venv/lib64": true
+    },
+    // MARK: Terminal
+    "terminal.integrated.enableMultiLinePasteWarning": "auto",
+    "terminal.integrated.inheritEnv": false,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.stickyScroll.enabled": false,
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.env.osx": {
+        "WORKSPACE_FOLDER": "${workspaceFolder}",
+        "PAGER": "less",
+        "LESS": "FRX",
+    },
+    "terminal.integrated.shellIntegration.enabled": true,
+    "terminal.integrated.suggest.enabled": true,
+    // MARK: Explorer
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "window.zoomLevel": 1,
+    "window.menuStyle": "custom",
+    "testing.automaticallyOpenPeekView": "failureAnywhere",
+    // MARK: Dev Container
+    "dev.containers.defaultFeatures": {
+        "ghcr.io/devcontainers-extra/features/ripgrep:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+    },
+    // MARK: Remote
+    "remote.defaultExtensionsIfInstalledLocally": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "GitHub.vscode-pull-request-github",
+        "shardulm94.trailing-spaces",
+        "silesky.toggle-boolean",
+        "ms-azuretools.vscode-docker",
+        "usernamehw.errorlens",
+        "streetsidesoftware.code-spell-checker",
+        "phil294.git-log--graph",
+        "arturock.gitstash",
+    ],
+    "remote.autoForwardPortsSource": "hybrid",
+    "zenMode.showTabs": "multiple",
+    "zenMode.hideLineNumbers": false,
+    "zenMode.hideStatusBar": false,
+    "screencastMode.fontSize": 40,
+    "screencastMode.verticalOffset": 90,
+    "screencastMode.keyboardOptions": {
+        "showCommands": false
+    },
+    // MARK: Vim
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            // select all lines
+            "before": [
+                "<leader>",
+                "a"
+            ],
+            "after": [
+                "g",
+                "g",
+                "V",
+                "G"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "t"
+            ],
+            "commands": [
+                "extension.toggleBool"
+            ]
+        },
+        // Git add/restore
+        {
+            "before": [
+                "<leader>",
+                "g",
+                "d"
+            ],
+            "commands": [
+                "git.openChange"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "g",
+                "r"
+            ],
+            "commands": [
+                "git.revertSelectedRanges"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "g",
+                "s"
+            ],
+            "commands": [
+                "git.stageSelectedRanges"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "g",
+                "u"
+            ],
+            "commands": [
+                "git.unstageSelectedRanges"
+            ]
+        },
+        // Go Back/Forward
+        {
+            "before": [
+                "<leader>",
+                "n"
+            ],
+            "commands": [
+                "workbench.action.navigateBack"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "m"
+            ],
+            "commands": [
+                "workbench.action.navigateForward"
+            ]
+        },
+        // Editor Group
+        {
+            "before": [
+                "<leader>",
+                "e",
+                "l"
+            ],
+            "commands": [
+                "workbench.action.moveEditorToRightGroup"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "e",
+                "h"
+            ],
+            "commands": [
+                "workbench.action.moveEditorToLeftGroup"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "e",
+                "j"
+            ],
+            "commands": [
+                "workbench.action.moveEditorToBelowGroup"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "e",
+                "k"
+            ],
+            "commands": [
+                "workbench.action.moveEditorToAboveGroup"
+            ]
+        },
+    ],
+    "vim.insertModeKeyBindings": [
+        {
+            "before": [
+                ";",
+                ";"
+            ],
+            "commands": [
+                "editor.action.triggerSuggest"
+            ]
+        }
+    ],
+    "vim.visualModeKeyBindings": [
+        {
+            "before": [
+                "J"
+            ],
+            "commands": [
+                "editor.action.moveLinesDownAction",
+                "editor.action.formatSelection"
+            ],
+            "silent": true,
+        },
+        {
+            "before": [
+                "K"
+            ],
+            "commands": [
+                "editor.action.moveLinesUpAction",
+                "editor.action.formatSelection"
+            ],
+            "silent": true,
+        },
+        {
+            "before": [
+                ">"
+            ],
+            "commands": [
+                "editor.action.indentLines"
+            ],
+            "silent": true,
+        },
+        {
+            "before": [
+                "<"
+            ],
+            "commands": [
+                "editor.action.outdentLines"
+            ],
+            "silent": true,
+        },
+        {
+            "before": [
+                "<leader>",
+                "g",
+                "r"
+            ],
+            "commands": [
+                "git.revertSelectedRanges"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "g",
+                "s"
+            ],
+            "commands": [
+                "git.stageSelectedRanges"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "g",
+                "u"
+            ],
+            "commands": [
+                "git.unstageSelectedRanges"
+            ]
+        },
+    ],
+    "vim.vimrc.enable": true,
+    "vim.vimrc.path": "$HOME/.vimrc",
+    "vim.foldfix": true,
+    "vim.hlsearch": true,
+    "vim.searchHighlightTextColor": "#f379ed",
+    "vim.visualstar": true,
+    "vim.useSystemClipboard": true,
+    "vim.leader": "<space>",
+    "vim.highlightedyank.enable": true,
+    "vim.highlightedyank.color": "rgba(90, 110, 170, 0.8)",
+    "vim.easymotion": true,
+    "vim.smartRelativeLine": true,
+    // "vim.statusBarColorControl": true,
+    // "vim.statusBarColors.normal": "#007acc",
+    // "vim.statusBarColors.insert": "#77d48b",
+    // "vim.statusBarColors.commandlineinprogress": "#005f5f",
+    // "vim.statusBarColors.replace": "#cc6d00",
+    // "vim.statusBarColors.surroundinputmode": "#cc6d00",
+    // MARK: Other Extensions
+    "extensions.autoUpdate": "on",
+    "markdown-preview-enhanced.previewTheme": "github-light.css",
+    "markdown-preview-enhanced.scrollSync": false,
+    "vscode-json-editor.theme": "dark",
+    "redhat.telemetry.enabled": true,
+    "breadcrumbs.enabled": true,
+    "aws.suppressPrompts": {
+        "regionAddAutomatically": true,
+    },
+    "aws.samcli.enableCodeLenses": true,
+    "everforest.darkWorkbench": "high-contrast",
+    "everforest.darkContrast": "hard",
+    "hediet.vscode-drawio.resizeImages": null,
+    "yaml.format.enable": true,
+    "yaml.customTags": [
+        "!And",
+        "!And sequence",
+        "!If",
+        "!If sequence",
+        "!Not",
+        "!Not sequence",
+        "!Equals",
+        "!Equals sequence",
+        "!Or",
+        "!Or sequence",
+        "!FindInMap",
+        "!FindInMap sequence",
+        "!Base64",
+        "!Join",
+        "!Join sequence",
+        "!Cidr",
+        "!Ref",
+        "!Sub",
+        "!Sub sequence",
+        "!GetAtt",
+        "!GetAZs",
+        "!ImportValue",
+        "!ImportValue sequence",
+        "!Select",
+        "!Select sequence",
+        "!Split",
+        "!Split sequence"
+    ],
+    "sequence.replaceSelection": true,
+    "cmake.configureOnOpen": false,
+    "cmake.options.statusBarVisibility": "visible",
+    "cSpell.userWords": [
+        "accum",
+        "amazonq",
+        "amazonwebservices",
+        "apigw",
+        "apigwv",
+        "astype",
+        "autodocstring",
+        "autofetch",
+        "autopep",
+        "boto",
+        "botocore",
+        "chezmoi",
+        "classmethod",
+        "CODEOWNERS",
+        "codewhisperer",
+        "datacatalog",
+        "dataframe",
+        "debugpy",
+        "devcontainer",
+        "devkit",
+        "dotenv",
+        "drawio",
+        "easymotion",
+        "everforest",
+        "fgcolor",
+        "fillna",
+        "foldfix",
+        "glueetl",
+        "glueray",
+        "highlightedyank",
+        "hlsearch",
+        "iloc",
+        "isort",
+        "lefthook",
+        "LESSCHARSET",
+        "levelname",
+        "mypy",
+        "numpy",
+        "outdent",
+        "Overridable",
+        "Powerline",
+        "pwsh",
+        "pycache",
+        "pydantic",
+        "pylance",
+        "pypdf",
+        "pyproject",
+        "pytest",
+        "pythonshell",
+        "pytz",
+        "pyyaml",
+        "qiita",
+        "reflog",
+        "samcli",
+        "screencast",
+        "sonarlint",
+        "statemachine",
+        "stepfunctions",
+        "thead",
+        "toggleboolean",
+        "unstage",
+        "venv",
+        "vimrc",
+        "visualstar",
+        "webelement",
+        "Xunit"
+    ],
+    "cSpell.ignorePaths": [
+        "package-lock.json",
+        "node_modules",
+        "vscode-extension",
+        ".git/objects",
+        ".vscode",
+        ".vscode-insiders",
+        "/Users/trevelyan1103/Library/Application Support/Code/User/settings.json",
+    ],
+    "toggleboolean.mapping": {
+        "true": false,
+        "false": true,
+        "True": "False",
+        "False": "True",
+        "yes": "no",
+        "no": "yes",
+        "on": "off",
+        "off": "on",
+        "enabled": "disabled",
+        "disabled": "enabled",
+    },
+    "sonarlint.rules": {
+        // Rename this local variable "Segment" to match the regular expression ^[_a-z][a-z0-9_]*$.
+        "python:S117": {
+            "level": "off"
+        },
+        // Complete the task associated to this "TODO" comment.
+        "python:S1135": {
+            "level": "off"
+        },
+    },
+}

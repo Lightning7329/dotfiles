@@ -3,6 +3,8 @@
 .zsh/darwin.zsh
 .zprofile
 .config/git/darwin.conf
+Library
+.config/vscode
 {{- end -}}
 
 {{- if eq .chezmoi.os "darwin" -}}
