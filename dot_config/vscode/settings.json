@@ -169,6 +169,9 @@
         "ghcr.io/devcontainers-extra/features/ripgrep:1": {},
         "ghcr.io/devcontainers/features/github-cli:1": {},
     },
+    "dotfiles.repository": "Lightning7329/dotfiles",
+    "dotfiles.targetPath": "~/dotfiles",
+    "dotfiles.installCommand": "install.sh",
     // MARK: Remote
     "remote.defaultExtensionsIfInstalledLocally": [
         "GitHub.copilot",
