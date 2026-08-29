@@ -15,8 +15,8 @@ Library
 {{- end }}
 
 {{- if eq .profile "container" -}}
-# Dev Container はホストの gitconfig を引き継ぐため不要
-.config/git/user.conf
+# Dev Container は VS Code がホストからコピーした identity を保持する
+.gitconfig
 {{- end }}
 
 # General

@@ -20,5 +20,4 @@
 [init]
 	defaultBranch = main
 [include]
-	path = ~/.config/git/user.conf
 	path = ~/.config/git/darwin.conf
