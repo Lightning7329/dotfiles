@@ -1,0 +1,16 @@
+#!/bin/sh
+# stdin  = 現在の ~/.zshrc（イメージが用意したもの）
+# stdout = 新しい ~/.zshrc
+BEGIN="# >>> chezmoi managed >>>"
+END="# <<< chezmoi managed <<<"
+
+# 前回追記したブロックを取り除く（冪等性の担保）
+sed "/^${BEGIN}\$/,/^${END}\$/d"
+
+cat <<EOF
+${BEGIN}
+for f in "\$HOME"/.zsh/*.zsh(N); do
+    source "\$f"
+done
+${END}
+EOF

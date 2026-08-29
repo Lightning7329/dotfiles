@@ -50,8 +50,3 @@ alias gss='git status -sb'
 alias gg='git graph -10'
 alias gb='git branch'
 alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
-
-# 環境固有の設定を読み込む
-for f in ~/.zsh/*.zsh(N); do
-    source "$f"
-done

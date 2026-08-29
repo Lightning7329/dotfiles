@@ -1,0 +1,17 @@
+#!/bin/sh
+BEGIN="# >>> chezmoi managed >>>"
+END="# <<< chezmoi managed <<<"
+
+sed "/^${BEGIN}\$/,/^${END}\$/d"
+
+cat <<EOF
+${BEGIN}
+case \$- in
+    *i*) ;;
+      *) return ;;
+esac
+for f in "\$HOME"/.bash/*.bash; do
+    [ -r "\$f" ] && . "\$f"
+done
+${END}
+EOF
