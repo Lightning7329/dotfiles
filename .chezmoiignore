@@ -1,0 +1,10 @@
+{{- if ne .chezmoi.os "darwin" -}}
+# macOS 以外では macOS 固有のものを配らない
+.zsh/darwin.zsh
+.zprofile
+{{- end -}}
+
+{{- if eq .chezmoi.os "darwin" -}}
+# macOS では Linux 固有のものを配らない
+.zsh/linux.zsh
+{{- end }}
