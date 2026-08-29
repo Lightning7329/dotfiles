@@ -6,18 +6,19 @@
 .config/git/darwin.conf
 Library
 .config/vscode
-{{- end -}}
+{{- end }}
 
-{{- if eq .chezmoi.os "darwin" -}}
+{{ if eq .chezmoi.os "darwin" -}}
 # macOS では Linux 固有のものを配らない
 .bash/linux.bash
 .zsh/linux.zsh
-{{- end -}}
+{{- end }}
 
 {{- if eq .profile "container" -}}
 # Dev Container はホストの gitconfig を引き継ぐため不要
 .config/git/user.conf
 {{- end }}
 
+# General
 install.sh
 README.md
