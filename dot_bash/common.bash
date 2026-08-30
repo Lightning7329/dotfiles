@@ -35,7 +35,13 @@ __bash_prompt() {
         echo -n "\w"
     fi`'
 
-    PS1="$gitbranch$GREEN$dir$RESET_COLOR\$ "
+    # Dev Container ではユーザー名も表示する
+    local user=''
+    if [ -f /.dockerenv ]; then
+        user='\u:'
+    fi
+
+    PS1="$gitbranch$GREEN$user$dir$RESET_COLOR\$ "
     unset -f __bash_prompt
 }
 __bash_prompt

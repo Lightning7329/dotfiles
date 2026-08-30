@@ -25,6 +25,12 @@ function cc() {
     echo -n $1 | wc -c
 }
 
+# Dev Container ではユーザー名も表示する
+typeset -g __user_prefix=''
+if [[ -f /.dockerenv ]]; then
+    __user_prefix='%n:'
+fi
+
 function precmd() {
     local branchName=$(git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || git --no-optional-locks rev-parse --short HEAD 2>/dev/null)
     if [ -n "$branchName" ]; then
@@ -40,7 +46,7 @@ function precmd() {
     fi
 
     PROMPT="%F{240}$VIRTUAL_ENV_PROMPT$branchName%f"'
-%F{012}'$dir'%f%# '
+%F{012}'$__user_prefix$dir'%f%# '
 }
 
 # aliases
