@@ -19,6 +19,7 @@
 {{-   $email = promptStringOnce . "email" "Git email address" -}}
 {{- end -}}
 mode = {{ $mode | quote }}
+sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [data]
 	profile = {{ $profile | quote }}
