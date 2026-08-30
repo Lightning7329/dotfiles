@@ -59,7 +59,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply Lightning7329
 
 You will be prompted once for a Git user name and email. They are written to
 `~/.config/chezmoi/chezmoi.toml`, **outside** this repository, and rendered into
-`~/.config/git/user.conf` — which is why this repo can stay public.
+`~/.gitconfig` — which is why this repo can stay public.
 
 ### Dev Containers
 
@@ -79,6 +79,12 @@ VS Code clones this repository into every new container and runs `install.sh`,
 which bootstraps chezmoi into `~/.local/bin` and applies the `container`
 profile.
 
+`install.sh` passes `--source` to `chezmoi init`, and `.chezmoi.toml.tmpl`
+records that path back into the generated config as `sourceDir`. `--source` is a
+per-invocation flag, so without this every later `chezmoi` command in the
+container would fall back to the default `~/.local/share/chezmoi` and find an
+empty directory there.
+
 ## Layout
 
 | Source                              | Target                            | Notes                              |
@@ -86,16 +92,23 @@ profile.
 | `dot_zsh/`, `modify_dot_zshrc`      | `~/.zsh/`, `~/.zshrc`             | loader stub + `common`/OS files    |
 | `dot_bash/`, `modify_dot_bashrc`    | `~/.bash/`, `~/.bashrc`           | same structure as zsh              |
 | `dot_zprofile`                      | `~/.zprofile`                     | macOS only (`brew shellenv`)       |
-| `dot_gitconfig`                     | `~/.gitconfig`                    | aliases and shared options         |
-| `dot_config/git/user.conf.tmpl`     | `~/.config/git/user.conf`         | identity, from local prompt values |
+| `dot_gitconfig.tmpl`                | `~/.gitconfig`                    | identity, from local prompt values |
+| `dot_config/git/config`             | `~/.config/git/config`            | aliases and shared options         |
 | `dot_config/git/darwin.conf`        | `~/.config/git/darwin.conf`       | Sourcetree diff/merge, macOS only  |
 | `dot_config/vscode/`                | `~/.config/vscode/`               | canonical VS Code config           |
 | `private_Library/…/User/symlink_*`  | `~/Library/…/Code/User/*`         | macOS paths → canonical config     |
 | `dot_vimrc`, `dot_gitignore_global` | `~/.vimrc`, `~/.gitignore_global` | shared everywhere                  |
 
-`~/.gitconfig` pulls identity and platform-specific settings in through
-`[include]` directives. Git silently ignores includes whose target is missing,
-so a file that `.chezmoiignore` skips simply has no effect — no conditionals
+Git config is deliberately split in two. Everything shared lives in
+`~/.config/git/config`, the XDG location Git reads on its own, and `~/.gitconfig`
+carries nothing but identity. That split is what makes containers work: VS Code
+copies the host `~/.gitconfig` into the container at creation time, so
+`.chezmoiignore` skips ours there and the inherited identity and credential
+helper survive — while the shared aliases still arrive through the XDG file.
+
+`~/.config/git/config` pulls platform-specific settings in through an
+`[include]` directive. Git silently ignores includes whose target is missing, so
+a file that `.chezmoiignore` skips simply has no effect — no conditionals
 required.
 
 VS Code stores its user config under a different path on every OS, but all of
