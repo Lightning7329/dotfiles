@@ -41,11 +41,13 @@ __bash_prompt() {
 __bash_prompt
 
 # aliases
+alias printpath='echo $PATH | tr : \\n'
 alias hisgrep='history | grep'
 alias gs='git status'
 alias gss='git status -sb'
 alias gg='git graph -10'
 alias gb='git branch'
+alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
 
 # functions
 cc() {

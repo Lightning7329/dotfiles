@@ -44,6 +44,7 @@ function precmd() {
 }
 
 # aliases
+alias printpath='echo $PATH | tr : \\n'
 alias hisgrep='history | grep'
 alias gs='git status'
 alias gss='git status -sb'
