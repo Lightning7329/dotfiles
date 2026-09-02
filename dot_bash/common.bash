@@ -54,6 +54,7 @@ alias gss='git status -sb'
 alias gg='git graph -10'
 alias gb='git branch'
 alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
+alias treex='tree -a --dirsfirst -F'
 
 # functions
 cc() {

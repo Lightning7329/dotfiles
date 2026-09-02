@@ -25,6 +25,13 @@ function cc() {
     echo -n $1 | wc -c
 }
 
+function colorPallet() {
+    for c in {000..255}; do
+        echo -n "\e[38;5;${c}m $c"
+        [ $(($c % 16)) -eq 15 ] && echo
+    done
+}
+
 # Dev Container ではユーザー名も表示する
 typeset -g __user_prefix=''
 if [[ -f /.dockerenv ]]; then
@@ -33,9 +40,18 @@ fi
 
 function precmd() {
     local branchName=$(git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || git --no-optional-locks rev-parse --short HEAD 2>/dev/null)
+    if [ "$branchName" = "main" ]; then
+        branchColor=009
+    elif [[ "$branchName" =~ (develop|feature)/* ]]; then
+        branchColor=010
+    elif [[ "$branchName" =~ (hotfix|fix)/* ]]; then
+        branchColor=011
+    else
+        branchColor=008
+    fi
     if [ -n "$branchName" ]; then
         branchName="
-($branchName)"
+%F{$branchColor}($branchName)%f"
     fi
 
     if [[ -n "$WORKSPACE_FOLDER" && $PWD == $WORKSPACE_FOLDER* ]]; then
@@ -57,3 +73,4 @@ alias gss='git status -sb'
 alias gg='git graph -10'
 alias gb='git branch'
 alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
+alias treex='tree -a --dirsfirst -F'
