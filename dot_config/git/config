@@ -2,7 +2,9 @@
 	excludesfile = ~/.gitignore_global
 [alias]
 	graph = log --oneline --abbrev-commit --all --graph
+	graphx = log --all --graph --format='format:%C(yellow)%h %C(auto)%d %Creset%s%C(white dim) [%ad - %an]' --date='format:%Y/%m/%d %H:%M:%S'
 	logl = log --oneline
+	loglx = log --format='format:%C(yellow)%h %C(auto)%d %Creset%s%C(white dim) [%ad - %an]' --date='format:%Y/%m/%d %H:%M:%S'
 	logs = log --compact-summary
 	diffs = diff --cached
 	diffp = diff HEAD~ HEAD
