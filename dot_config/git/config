@@ -1,5 +1,7 @@
 [core]
 	excludesfile = ~/.gitignore_global
+	pager = LC_ALL=ja_JP.UTF-8 less -x4
+	editor = vim
 [alias]
 	graph = log --oneline --abbrev-commit --all --graph
 	graphx = log --all --graph --format='format:%C(yellow)%h %C(auto)%d %Creset%s%C(white dim) [%ad - %an]' --date='format:%Y/%m/%d %H:%M:%S'
@@ -15,6 +17,7 @@
 	mix = commit --amend --no-edit
 	unstage = restore --staged
 	fetchp = fetch --prune
+	fsw = !"f(){ git fetchp && git sw $1; };f"
 [rebase]
 	autoStash = true
 [pull]
