@@ -45,7 +45,8 @@ On this machine (`private` profile, `mode = "symlink"`) the deployed dotfiles
 are symlinks back into this repository, and this directory *is* `sourceDir`.
 Editing a file here changes the live config immediately — no `apply` needed.
 Exceptions that do need `chezmoi apply`: anything ending in `.tmpl`, the
-`modify_` scripts, `symlink_` entries, and `.chezmoiignore`.
+`modify_` scripts, `symlink_` entries, `.chezmoiignore`, and anything under
+`.chezmoiscripts/`.
 
 Never edit the deployed path (`~/.zshrc`, `~/.gitconfig`, …) for managed files;
 edit the source here. New files that appear inside a managed directory are real
@@ -86,6 +87,32 @@ settings — do not add conditionals to the template.
 `private_Library/.../User/symlink_*.tmpl` files contain only a target path and
 exist to point the macOS location at that canonical copy. Add real settings to
 `dot_config/vscode/`.
+
+**Attribute order stacks in a fixed sequence — `private_` goes after
+`modify_`, not before.** The correct name is `modify_private_settings.json`.
+Get the order wrong (`private_modify_settings.json`) and chezmoi silently
+stops treating the file as a script: it reads as a literal filename instead,
+`chezmoi diff` shows a bogus new file being created rather than a diff against
+the real target, and the `private_` permissions (0600) are lost. Verify any
+new multi-attribute file name with `chezmoi diff` before trusting it.
+
+**A `run_` script under `.chezmoiscripts/` doesn't correspond to a target
+file.** `chezmoi diff` renders it as though a file will be created at that
+path, but nothing is actually written there — the path is only a bookkeeping
+key for `run_once_`/`run_onchange_` change-detection and for ordering. Don't
+nest these under `dot_claude/` (or any other `dot_*` directory) alongside
+entries that map to real deployed files; that breaks the assumption that
+everything in there is really deployed. `.chezmoiscripts/` is where
+target-less scripts go instead.
+
+**Not every key in `~/.claude/settings.json` belongs to this repository.**
+Claude Code rewrites the file itself during normal use (`/model`, `/fast`,
+`/hooks`, plugin state, permission approvals, the statusline installer).
+`dot_claude/modify_private_settings.json` merges in only the keys this repo
+wants to own — currently just `hooks` — with `jq '. * $managed'`, and passes
+everything else through untouched. Before adding a key to `managed`, check
+whether Claude Code itself ever writes it; if so, leave it out, or the next
+`chezmoi apply` will silently revert whatever the user changed interactively.
 
 ## Commit messages
 

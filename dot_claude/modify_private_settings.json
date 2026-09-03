@@ -1,0 +1,19 @@
+#!/bin/sh
+# stdin  = 現在の ~/.claude/settings.json
+# stdout = 新しい ~/.claude/settings.json
+#
+# このファイルは Claude Code 本体が使用中に書き換える
+# (model, effortLevel, statusLine, permissions.allow, enabledPlugins, ...)。
+# 丸ごと管理下に置くとインタラクティブな変更を毎回 apply で巻き戻してしまうので、
+# dotfiles 側を真実の源にしたいキーだけ managed に列挙し、jq の `*` (右側優先の
+# 再帰マージ) でそれ以外のキーはそのまま素通りさせる。
+current="$(cat)"
+managed='{
+  "hooks": {}
+}'
+
+if [ -z "$current" ]; then
+  echo "$managed"
+else
+  echo "$current" | jq --argjson managed "$managed" '. * $managed'
+fi

@@ -49,6 +49,27 @@ The block is delimited by markers and stripped before being re-added, so
 and `~/.bash/*.bash`, which are loaded in alphabetical order — `common` first,
 then the OS-specific file that overrides it.
 
+**Claude Code owns most of its own settings.** `~/.claude/settings.json` is
+rewritten by Claude Code itself during normal use — model/effort-level
+switches, permission approvals, plugin state, the statusline installer.
+Managing the whole file would fight that. `dot_claude/modify_private_settings.json`
+is a filter, like the shell rc scripts above: it merges in only the keys this
+repository wants to own (currently just `hooks`) with `jq '. * $managed'` and
+leaves everything else untouched. The attribute order matters — `modify_` has
+to come before `private_` (`modify_private_settings.json`, not the reverse) or
+chezmoi stops treating the file as a script at all.
+
+**External binaries are installed by a script, not vendored.** The statusline
+binary ([cc-statusline](https://github.com/Lightning7329/cc-statusline)) is a
+compiled, platform-specific release asset, so it's downloaded rather than
+committed. `.chezmoiscripts/run_onchange_install-cc-statusline.sh.tmpl` runs
+its installer via `curl`; the `gitHubLatestRelease` template function embeds
+the latest tag name in a comment, so a new upstream release changes the
+rendered script and `run_onchange_` picks it up automatically on the next
+`chezmoi apply`. Scripts like this don't correspond to a real deployed file,
+which is why it lives in `.chezmoiscripts/` rather than `dot_claude/` — the
+latter mirrors only what's actually deployed to `~/.claude/`.
+
 ## Installation
 
 ### macOS / WSL2
@@ -87,17 +108,19 @@ empty directory there.
 
 ## Layout
 
-| Source                              | Target                            | Notes                              |
-| ----------------------------------- | --------------------------------- | ---------------------------------- |
-| `dot_zsh/`, `modify_dot_zshrc`      | `~/.zsh/`, `~/.zshrc`             | loader stub + `common`/OS files    |
-| `dot_bash/`, `modify_dot_bashrc`    | `~/.bash/`, `~/.bashrc`           | same structure as zsh              |
-| `dot_zprofile`                      | `~/.zprofile`                     | macOS only (`brew shellenv`)       |
-| `dot_gitconfig.tmpl`                | `~/.gitconfig`                    | identity, from local prompt values |
-| `dot_config/git/config`             | `~/.config/git/config`            | aliases and shared options         |
-| `dot_config/git/darwin.conf`        | `~/.config/git/darwin.conf`       | Sourcetree diff/merge, macOS only  |
-| `dot_config/vscode/`                | `~/.config/vscode/`               | canonical VS Code config           |
-| `private_Library/…/User/symlink_*`  | `~/Library/…/Code/User/*`         | macOS paths → canonical config     |
-| `dot_vimrc`, `dot_gitignore_global` | `~/.vimrc`, `~/.gitignore_global` | shared everywhere                  |
+| Source                                                       | Target                            | Notes                                                 |
+| ------------------------------------------------------------ | --------------------------------- | ----------------------------------------------------- |
+| `dot_zsh/`, `modify_dot_zshrc`                               | `~/.zsh/`, `~/.zshrc`             | loader stub + `common`/OS files                       |
+| `dot_bash/`, `modify_dot_bashrc`                             | `~/.bash/`, `~/.bashrc`           | same structure as zsh                                 |
+| `dot_zprofile`                                               | `~/.zprofile`                     | macOS only (`brew shellenv`)                          |
+| `dot_gitconfig.tmpl`                                         | `~/.gitconfig`                    | identity, from local prompt values                    |
+| `dot_config/git/config`                                      | `~/.config/git/config`            | aliases and shared options                            |
+| `dot_config/git/darwin.conf`                                 | `~/.config/git/darwin.conf`       | Sourcetree diff/merge, macOS only                     |
+| `dot_config/vscode/`                                         | `~/.config/vscode/`               | canonical VS Code config                              |
+| `private_Library/…/User/symlink_*`                           | `~/Library/…/Code/User/*`         | macOS paths → canonical config                        |
+| `dot_vimrc`, `dot_gitignore_global`                          | `~/.vimrc`, `~/.gitignore_global` | shared everywhere                                     |
+| `dot_claude/modify_private_settings.json`                    | `~/.claude/settings.json`         | merges only `hooks`; other keys are Claude Code's own |
+| `.chezmoiscripts/run_onchange_install-cc-statusline.sh.tmpl` | *(script only, no target)*        | installs/updates the statusline binary                |
 
 Git config is deliberately split in two. Everything shared lives in
 `~/.config/git/config`, the XDG location Git reads on its own, and `~/.gitconfig`
