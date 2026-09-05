@@ -9,8 +9,10 @@ suite, and no linter — the "program" is the set of chezmoi source-state files,
 and the only way to run it is to render and apply it.
 
 `README.md` documents the design (profile detection, symlink vs file mode, the
-appended shell block, the git config split). Read it before making structural
-changes; the notes below cover what it does not.
+appended shell block, the git config split, the settings filter, the
+notification path). Read it before making structural changes; the notes below
+cover what it does not — the traps, not the rationale. Where both files touch
+the same subject, the rationale belongs there and only there.
 
 ## Verifying a change
 
@@ -111,28 +113,36 @@ new multi-attribute file name with `chezmoi diff` before trusting it.
 **A `run_` script under `.chezmoiscripts/` doesn't correspond to a target
 file.** `chezmoi diff` renders it as though a file will be created at that
 path, but nothing is actually written there — the path is only a bookkeeping
-key for `run_once_`/`run_onchange_` change-detection and for ordering. Don't
-nest these under `dot_claude/` (or any other `dot_*` directory) alongside
-entries that map to real deployed files; that breaks the assumption that
-everything in there is really deployed. `.chezmoiscripts/` is where
-target-less scripts go instead.
+key for `run_once_`/`run_onchange_` change-detection and for ordering. Reading
+that diff as a real deployment is the mistake; keep such scripts in
+`.chezmoiscripts/` rather than under `dot_claude/` or any other `dot_*`
+directory, where everything else really is deployed.
 
 **Not every key in `~/.claude/settings.json` belongs to this repository.**
 Claude Code rewrites the file itself during normal use (`/model`, `/fast`,
 `/hooks`, plugin state, permission approvals, the statusline installer).
-`dot_claude/modify_private_settings.json` merges in only the keys this repo
-wants to own — currently just `hooks` — with `jq '. * $managed'`, and passes
-everything else through untouched. Before adding a key to `managed`, check
+README covers what `dot_claude/modify_private_settings.json` owns and why
+`hooks` is assigned rather than merged. Before adding a key to `managed`, check
 whether Claude Code itself ever writes it; if so, leave it out, or the next
 `chezmoi apply` will silently revert whatever the user changed interactively.
 
 `jq`'s `*` merges recursively, so it can add and override but never *remove*.
-Dropping an entry from `managed` leaves whatever an earlier `apply` already
-wrote sitting in the target file forever. `hooks` is therefore assigned rather
-than merged (`.hooks = ($managed.hooks // {})`), which is what makes deleting a
-hook take effect; the `// {}` keeps a bare `null` out of the target when
-`managed` has no `hooks` at all. Any other key that needs deletions has to be
-assigned the same way.
+Any key whose deletions have to take effect must be assigned the way `hooks` is
+(`.hooks = ($managed.hooks // {})`) instead of being left to the merge; the
+`// {}` keeps a bare `null` out of the target when `managed` has no `hooks` at
+all.
+
+**Never pipe the file through `echo` inside that filter.** `sh`'s `echo`
+interprets backslash escapes on dash *and* on the macOS `/bin/sh`, so a
+`settings.json` holding a JSON `\\` or `\t` reaches `jq` mangled and the filter
+dies with a parse error. Use `printf '%s\n'`.
+
+**A `modify_` script that fails is nearly invisible.** chezmoi prints one line
+of stderr, leaves the target untouched, and finishes with an overall exit 0 —
+so the only symptom is that the hooks were never deployed. That is also why the
+filter bails out early when `jq` is missing rather than letting the pipeline
+break: `install.sh` installs only chezmoi, and slim container images ship no
+`jq`.
 
 ## Commit messages
 
