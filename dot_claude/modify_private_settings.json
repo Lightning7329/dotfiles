@@ -5,6 +5,14 @@
 # 管理方針と、jq の `*` がキーを削除できないので hooks だけ代入にしている件は
 # CLAUDE.md 参照。managed が hooks しか持たない今はマージ側が空回りしているが、
 # 削除を効かせたいキーが他に増えたときのために構造は残してある。
+#
+# Notification イベントの matcher は「Claude が人間を待っている」種別だけを列挙する。
+# 除外しているもの:
+#   idle_prompt          応答完了は Stop が既に鳴らしているので二度手間
+#   agent_completed      同上
+#   auth_success         報告のみで行動を要さない
+#   elicitation_complete / elicitation_response / quota_auto_resume_*  同上
+
 current="$(cat)"
 managed='{
   "hooks": {
@@ -20,6 +28,7 @@ managed='{
     ],
     "Notification": [
       {
+        "matcher": "permission_prompt|agent_needs_input|elicitation_dialog|elicitation_url_dialog",
         "hooks": [
           {
             "type": "command",
@@ -30,11 +39,6 @@ managed='{
     ]
   }
 }'
-
-# Notification イベント (permission_prompt, idle_prompt など) は発火しているのに、
-# VS Code では Claude Code 自身の通知が拡張まで届かない。ログ専用フックで発火を
-# 確認済みなので、Stop と同じ経路で自前で鳴らす。matcher を付けずに一本にして
-# あるのは、種別ごとにラベルを分けるより取りこぼしを無くす方を優先したため。
 
 if [ -z "$current" ]; then
   echo "$managed"
