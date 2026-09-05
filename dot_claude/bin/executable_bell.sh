@@ -44,18 +44,23 @@ resolve_tty() {
     esac
     # trace は失敗時のログにしか使わないので、記録が無効なら組み立てない
     [ -f "$log" ] && trace="$trace $p:$(ps -o comm= -p "$p" 2>/dev/null)"
+    # 候補は必ずキャラクタデバイスか確かめてから返す。書き込みはリダイレクトなので、
+    # 存在しないパスを渡すと端末に書く代わりに通常ファイルを作ってしまう。root で
+    # 走る Dev Container ではそれが成功し、/dev にゴミを残したまま "OK" とログして
+    # 通知だけ来ない、という一番たちの悪い壊れ方をする。
+    #
     # Linux: ファイルディスクリプタの向き先を /proc から読む
     for fd in 0 1 2; do
       t=$(readlink "/proc/$p/fd/$fd" 2>/dev/null) || continue
       case "$t" in
-        /dev/pts/* | /dev/tty*) echo "$t"; return 0 ;;
+        /dev/pts/* | /dev/tty*) [ -c "$t" ] && { echo "$t"; return 0; } ;;
       esac
     done
     # macOS ほか: ps から端末名を引く (Linux でも pts/0 の形で返る)
     t=$(ps -o tty= -p "$p" 2>/dev/null | tr -d '[:space:]')
     case "$t" in
       '' | '?' | '??' | '-') ;;
-      *) echo "/dev/$t"; return 0 ;;
+      *) [ -c "/dev/$t" ] && { echo "/dev/$t"; return 0; } ;;
     esac
     p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d '[:space:]')
   done
