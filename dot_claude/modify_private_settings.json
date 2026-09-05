@@ -14,6 +14,16 @@
 #   elicitation_complete / elicitation_response / quota_auto_resume_*  同上
 
 current="$(cat)"
+
+# jq が無い環境では管理を諦めて現状をそのまま返す。install.sh は chezmoi しか
+# 入れず dot_claude はどのプロファイルでも配られるので、jq を持たないコンテナは
+# 普通にありうる。ここで落ちても chezmoi は stderr に 1 行出して apply を続けて
+# しまい、フックが配られていないことに気づけない。
+if ! command -v jq >/dev/null 2>&1; then
+  [ -n "$current" ] && printf '%s\n' "$current"
+  exit 0
+fi
+
 managed='{
   "hooks": {
     "Stop": [
@@ -40,8 +50,11 @@ managed='{
   }
 }'
 
+# echo ではなく printf。sh の echo はバックスラッシュを解釈する実装があり
+# (dash はもちろん macOS の /bin/sh もそう)、settings.json に JSON の `\\` や
+# `\t` が入っていると潰れて jq が parse error で落ちる。
 if [ -z "$current" ]; then
-  echo "$managed"
+  printf '%s\n' "$managed"
 else
-  echo "$current" | jq --argjson managed "$managed" '. * $managed | .hooks = ($managed.hooks // {})'
+  printf '%s\n' "$current" | jq --argjson managed "$managed" '. * $managed | .hooks = ($managed.hooks // {})'
 fi
