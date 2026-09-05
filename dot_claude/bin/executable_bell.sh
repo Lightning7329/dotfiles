@@ -18,7 +18,6 @@
 set -u
 
 log=$HOME/.claude/bell.log
-trace=''
 
 # `[ -f ] && cmd` は条件が偽のとき 1 を返す。note がスクリプト末尾の文になる
 # 経路があるので、明示的に 0 を返さないとフック全体が失敗扱いになり、
@@ -32,8 +31,12 @@ note() {
 # macOS では sh -c が exec 最適化でスクリプトに置き換わるため親が直接 claude
 # だが、Dev Container の sh (dash) は最適化せず間に 1 段挟まる。その中間の sh は
 # 制御端末から切り離されていて端末を持たないので、親だけ見ると空振りする。
+#
+# この関数はコマンド置換 (サブシェル) で呼ぶので、中で代入した変数は呼び出し元に
+# 返らない。失敗時のチェーンは呼び出し元に渡さず、ここで note に書き出す。
 resolve_tty() {
   p=$PPID
+  trace=''
   # 遡る上限。カウンタを手で回す代わりに固定リストを畳む (seq は POSIX 外)。
   for _ in 1 2 3 4 5 6 7 8; do
     case "$p" in
@@ -56,11 +59,11 @@ resolve_tty() {
     esac
     p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d '[:space:]')
   done
+  note "resolve_tty FAILED chain:${trace:-<none>}"
   return 1
 }
 
 if ! dev=$(resolve_tty); then
-  note "resolve_tty FAILED chain:${trace:-<none>}"
   exit 0
 fi
 
