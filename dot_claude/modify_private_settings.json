@@ -17,12 +17,24 @@ managed='{
           }
         ]
       }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/bin/bell.sh \"Needs your input\""
+          }
+        ]
+      }
     ]
   }
 }'
 
-# Notification にフックを付けていないのは意図的。許可プロンプトは Claude Code
-# 自身が OSC 通知を出すので、足すと二重に鳴る。Stop を埋める理由は bell.sh 参照。
+# Notification イベント (permission_prompt, idle_prompt など) は発火しているのに、
+# VS Code では Claude Code 自身の通知が拡張まで届かない。ログ専用フックで発火を
+# 確認済みなので、Stop と同じ経路で自前で鳴らす。matcher を付けずに一本にして
+# あるのは、種別ごとにラベルを分けるより取りこぼしを無くす方を優先したため。
 
 if [ -z "$current" ]; then
   echo "$managed"
