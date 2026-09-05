@@ -158,6 +158,7 @@
     },
     "terminal.integrated.shellIntegration.enabled": true,
     "terminal.integrated.suggest.enabled": true,
+    "terminalNotification.showVsCodeNotification": false,
     // MARK: Explorer
     "explorer.confirmDragAndDrop": false,
     "explorer.confirmDelete": false,

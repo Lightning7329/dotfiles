@@ -2,18 +2,30 @@
 # stdin  = 現在の ~/.claude/settings.json
 # stdout = 新しい ~/.claude/settings.json
 #
-# このファイルは Claude Code 本体が使用中に書き換える
-# (model, effortLevel, statusLine, permissions.allow, enabledPlugins, ...)。
-# 丸ごと管理下に置くとインタラクティブな変更を毎回 apply で巻き戻してしまうので、
-# dotfiles 側を真実の源にしたいキーだけ managed に列挙し、jq の `*` (右側優先の
-# 再帰マージ) でそれ以外のキーはそのまま素通りさせる。
+# 管理方針と、jq の `*` がキーを削除できないので hooks だけ代入にしている件は
+# CLAUDE.md 参照。managed が hooks しか持たない今はマージ側が空回りしているが、
+# 削除を効かせたいキーが他に増えたときのために構造は残してある。
 current="$(cat)"
 managed='{
-  "hooks": {}
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/bin/bell.sh Finished"
+          }
+        ]
+      }
+    ]
+  }
 }'
+
+# Notification にフックを付けていないのは意図的。許可プロンプトは Claude Code
+# 自身が OSC 通知を出すので、足すと二重に鳴る。Stop を埋める理由は bell.sh 参照。
 
 if [ -z "$current" ]; then
   echo "$managed"
 else
-  echo "$current" | jq --argjson managed "$managed" '. * $managed'
+  echo "$current" | jq --argjson managed "$managed" '. * $managed | .hooks = ($managed.hooks // {})'
 fi

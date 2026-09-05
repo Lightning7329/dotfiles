@@ -48,6 +48,11 @@ Exceptions that do need `chezmoi apply`: anything ending in `.tmpl`, the
 `modify_` scripts, `symlink_` entries, `.chezmoiignore`, and anything under
 `.chezmoiscripts/`.
 
+Also `executable_` and `private_` files. Symlink mode cannot express a mode
+bit — permissions would follow the link target — so chezmoi writes those as
+real files instead of links, and the deployed copy goes stale until you
+apply. `dot_claude/bin/executable_bell.sh` is the one that bites today.
+
 Never edit the deployed path (`~/.zshrc`, `~/.gitconfig`, …) for managed files;
 edit the source here. New files that appear inside a managed directory are real
 files rather than links — bring them in with `chezmoi add <path>`.
@@ -113,6 +118,14 @@ wants to own — currently just `hooks` — with `jq '. * $managed'`, and passes
 everything else through untouched. Before adding a key to `managed`, check
 whether Claude Code itself ever writes it; if so, leave it out, or the next
 `chezmoi apply` will silently revert whatever the user changed interactively.
+
+`jq`'s `*` merges recursively, so it can add and override but never *remove*.
+Dropping an entry from `managed` leaves whatever an earlier `apply` already
+wrote sitting in the target file forever. `hooks` is therefore assigned rather
+than merged (`.hooks = ($managed.hooks // {})`), which is what makes deleting a
+hook take effect; the `// {}` keeps a bare `null` out of the target when
+`managed` has no `hooks` at all. Any other key that needs deletions has to be
+assigned the same way.
 
 ## Commit messages
 
