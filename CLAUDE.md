@@ -63,6 +63,13 @@ files rather than links — bring them in with `chezmoi add <path>`.
 `.zsh/darwin.zsh` and `Library`, never `dot_zsh/darwin.zsh` or
 `private_Library`. It is itself a template, evaluated per machine.
 
+That stripping applies to `run_` too, which is what makes ignoring a script
+non-obvious: `.chezmoiscripts/run_install-vscode-extensions.sh` has to be
+written `.chezmoiscripts/install-vscode-extensions.sh` — directory kept,
+attribute gone. `chezmoi managed` prints the path to match. A pattern that
+misses simply does nothing, so confirm the script stops running rather than
+trusting the spelling.
+
 **Order matters in `.chezmoi.toml.tmpl`.** The `container` test (`/.dockerenv`)
 must stay before the WSL2 test, because a Dev Container on WSL2 satisfies both.
 

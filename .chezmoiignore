@@ -19,6 +19,17 @@ Library
 .gitconfig
 {{- end }}
 
+{{ if ne .profile "private" -}}
+# VS Code 拡張の導入はホスト側の code でしか正しく行えない。
+# container: コンテナ内の code はコンテナ側の拡張ホストを操作するリモート CLI で、
+#   ここで入れたい拡張は extensionKind: ui のためホスト側にしか入らない。
+# work (WSL2): 同じ理由に加えて、--list-extensions が WSL 側の一覧を返すため
+#   Windows 側に導入済みでも検出できず、apply のたびに WSL 側へ入れ直しかねない。
+#   ホスト側に届くことを実機で確認できたら work だけ外す。
+# run_ は属性なので剥がれ、ターゲットパスは .chezmoiscripts/<name> になる。
+.chezmoiscripts/install-vscode-extensions.sh
+{{- end }}
+
 # General
 install.sh
 README.md
