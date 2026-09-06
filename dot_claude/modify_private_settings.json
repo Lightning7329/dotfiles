@@ -1,0 +1,60 @@
+#!/bin/sh
+# stdin  = 現在の ~/.claude/settings.json
+# stdout = 新しい ~/.claude/settings.json
+#
+# 管理方針と、jq の `*` がキーを削除できないので hooks だけ代入にしている件は
+# CLAUDE.md 参照。managed が hooks しか持たない今はマージ側が空回りしているが、
+# 削除を効かせたいキーが他に増えたときのために構造は残してある。
+#
+# Notification イベントの matcher は「Claude が人間を待っている」種別だけを列挙する。
+# 除外しているもの:
+#   idle_prompt          応答完了は Stop が既に鳴らしているので二度手間
+#   agent_completed      同上
+#   auth_success         報告のみで行動を要さない
+#   elicitation_complete / elicitation_response / quota_auto_resume_*  同上
+
+current="$(cat)"
+
+# jq が無い環境では管理を諦めて現状をそのまま返す。install.sh は chezmoi しか
+# 入れず dot_claude はどのプロファイルでも配られるので、jq を持たないコンテナは
+# 普通にありうる。ここで落ちても chezmoi は stderr に 1 行出して apply を続けて
+# しまい、フックが配られていないことに気づけない。
+if ! command -v jq >/dev/null 2>&1; then
+  [ -n "$current" ] && printf '%s\n' "$current"
+  exit 0
+fi
+
+managed='{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/bin/bell.sh Finished"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|agent_needs_input|elicitation_dialog|elicitation_url_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/bin/bell.sh \"Needs your input\""
+          }
+        ]
+      }
+    ]
+  }
+}'
+
+# echo ではなく printf。sh の echo はバックスラッシュを解釈する実装があり
+# (dash はもちろん macOS の /bin/sh もそう)、settings.json に JSON の `\\` や
+# `\t` が入っていると潰れて jq が parse error で落ちる。
+if [ -z "$current" ]; then
+  printf '%s\n' "$managed"
+else
+  printf '%s\n' "$current" | jq --argjson managed "$managed" '. * $managed | .hooks = ($managed.hooks // {})'
+fi

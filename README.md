@@ -49,6 +49,44 @@ The block is delimited by markers and stripped before being re-added, so
 and `~/.bash/*.bash`, which are loaded in alphabetical order — `common` first,
 then the OS-specific file that overrides it.
 
+**Claude Code owns most of its own settings.** `~/.claude/settings.json` is
+rewritten by Claude Code itself during normal use — model/effort-level
+switches, permission approvals, plugin state, the statusline installer.
+Managing the whole file would fight that. `dot_claude/modify_private_settings.json`
+is a filter, like the shell rc scripts above: it takes over exactly one key,
+`hooks`, and passes every other key through untouched.
+
+`hooks` is *replaced* rather than merged, which is a deliberate trade. Merging
+can add and override but never remove, so a hook deleted from the source would
+live on in the target forever; replacing makes deletions take effect. The price
+is that hooks added interactively through `/hooks` do not survive the next
+`chezmoi apply`.
+
+**Turn-completion notifications go out through the terminal.** Claude Code has
+no notification event for "the response just finished" — the only completion
+signal is an idle timer that fires tens of seconds late. So `Stop` and
+`Notification` hooks run `dot_claude/bin/executable_bell.sh`, which writes an
+OSC 777 escape sequence to the terminal device Claude Code is attached to, and
+a VS Code extension turns that into a desktop notification.
+
+The extension is `ui`-kind, so it runs on the host — which is what lets a
+sequence emitted inside a Dev Container reach the host's notification centre.
+`.chezmoiscripts/run_install-vscode-extensions.sh` installs it, and only under
+the `private` profile: in a container or on WSL2 the `code` CLI drives the
+remote extension host, where a `ui` extension does not belong.
+
+**External binaries are installed by a script, not vendored.** The statusline
+binary ([cc-statusline](https://github.com/Lightning7329/cc-statusline)) is a
+compiled, platform-specific release asset, so it's downloaded rather than
+committed. `.chezmoiscripts/run_onchange_install-cc-statusline.sh.tmpl` runs
+its installer via `curl`; the `gitHubLatestRelease` template function embeds
+the latest tag name in a comment, so a new upstream release changes the
+rendered script and `run_onchange_` picks it up automatically on the next
+`chezmoi apply`.
+
+Both scripts live in `.chezmoiscripts/` because neither produces a deployed
+file; `dot_claude/` mirrors only what actually lands in `~/.claude/`.
+
 ## Installation
 
 ### macOS / WSL2
@@ -87,17 +125,21 @@ empty directory there.
 
 ## Layout
 
-| Source                              | Target                            | Notes                              |
-| ----------------------------------- | --------------------------------- | ---------------------------------- |
-| `dot_zsh/`, `modify_dot_zshrc`      | `~/.zsh/`, `~/.zshrc`             | loader stub + `common`/OS files    |
-| `dot_bash/`, `modify_dot_bashrc`    | `~/.bash/`, `~/.bashrc`           | same structure as zsh              |
-| `dot_zprofile`                      | `~/.zprofile`                     | macOS only (`brew shellenv`)       |
-| `dot_gitconfig.tmpl`                | `~/.gitconfig`                    | identity, from local prompt values |
-| `dot_config/git/config`             | `~/.config/git/config`            | aliases and shared options         |
-| `dot_config/git/darwin.conf`        | `~/.config/git/darwin.conf`       | Sourcetree diff/merge, macOS only  |
-| `dot_config/vscode/`                | `~/.config/vscode/`               | canonical VS Code config           |
-| `private_Library/…/User/symlink_*`  | `~/Library/…/Code/User/*`         | macOS paths → canonical config     |
-| `dot_vimrc`, `dot_gitignore_global` | `~/.vimrc`, `~/.gitignore_global` | shared everywhere                  |
+| Source                                                       | Target                            | Notes                                                 |
+| ------------------------------------------------------------ | --------------------------------- | ----------------------------------------------------- |
+| `dot_zsh/`, `modify_dot_zshrc`                               | `~/.zsh/`, `~/.zshrc`             | loader stub + `common`/OS files                       |
+| `dot_bash/`, `modify_dot_bashrc`                             | `~/.bash/`, `~/.bashrc`           | same structure as zsh                                 |
+| `dot_zprofile`                                               | `~/.zprofile`                     | macOS only (`brew shellenv`)                          |
+| `dot_gitconfig.tmpl`                                         | `~/.gitconfig`                    | identity, from local prompt values                    |
+| `dot_config/git/config`                                      | `~/.config/git/config`            | aliases and shared options                            |
+| `dot_config/git/darwin.conf`                                 | `~/.config/git/darwin.conf`       | Sourcetree diff/merge, macOS only                     |
+| `dot_config/vscode/`                                         | `~/.config/vscode/`               | canonical VS Code config                              |
+| `private_Library/…/User/symlink_*`                           | `~/Library/…/Code/User/*`         | macOS paths → canonical config                        |
+| `dot_vimrc`, `dot_gitignore_global`                          | `~/.vimrc`, `~/.gitignore_global` | shared everywhere                                     |
+| `dot_claude/modify_private_settings.json`                    | `~/.claude/settings.json`         | owns `hooks`; other keys are Claude Code's own         |
+| `dot_claude/bin/executable_bell.sh`                          | `~/.claude/bin/bell.sh`           | hook body; emits OSC 777 for desktop notifications     |
+| `.chezmoiscripts/run_onchange_install-cc-statusline.sh.tmpl` | *(script only, no target)*        | installs/updates the statusline binary                 |
+| `.chezmoiscripts/run_install-vscode-extensions.sh`           | *(script only, no target)*        | installs host VS Code extensions, `private` only       |
 
 Git config is deliberately split in two. Everything shared lives in
 `~/.config/git/config`, the XDG location Git reads on its own, and `~/.gitconfig`
