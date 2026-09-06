@@ -33,4 +33,6 @@ Library
 # General
 install.sh
 README.md
+# ルートの README.md はディレクトリ配下の README.md にはマッチしない
+**/README.md
 CLAUDE.md
