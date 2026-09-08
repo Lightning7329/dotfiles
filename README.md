@@ -52,9 +52,10 @@ then the OS-specific file that overrides it.
 **Claude Code owns most of its own settings.** `~/.claude/settings.json` is
 rewritten by Claude Code itself during normal use — model/effort-level
 switches, permission approvals, plugin state, the statusline installer.
-Managing the whole file would fight that. `dot_claude/modify_private_settings.json`
-is a filter, like the shell rc scripts above: it takes over exactly one key,
-`hooks`, and passes every other key through untouched.
+Managing the whole file would fight that. `.chezmoiscripts/run_setup-claude-config.sh.tmpl`
+is a filter, like the shell rc scripts above: it takes over the keys listed in
+`.claude-payload/settings.managed.json` and passes every other key through
+untouched.
 
 `hooks` is *replaced* rather than merged, which is a deliberate trade. Merging
 can add and override but never remove, so a hook deleted from the source would
@@ -65,9 +66,9 @@ is that hooks added interactively through `/hooks` do not survive the next
 **Turn-completion notifications go out through the terminal.** Claude Code has
 no notification event for "the response just finished" — the only completion
 signal is an idle timer that fires tens of seconds late. So `Stop` and
-`Notification` hooks run `dot_claude/bin/executable_bell.sh`, which writes an
-OSC 777 escape sequence to the terminal device Claude Code is attached to, and
-a VS Code extension turns that into a desktop notification.
+`Notification` hooks run `.claude-payload/bell.sh`, which writes an OSC 777
+escape sequence to the terminal device Claude Code is attached to, and a VS
+Code extension turns that into a desktop notification.
 
 The extension is `ui`-kind, so it runs on the host — which is what lets a
 sequence emitted inside a Dev Container reach the host's notification centre.
@@ -84,8 +85,26 @@ the latest tag name in a comment, so a new upstream release changes the
 rendered script and `run_onchange_` picks it up automatically on the next
 `chezmoi apply`.
 
-Both scripts live in `.chezmoiscripts/` because neither produces a deployed
-file; `dot_claude/` mirrors only what actually lands in `~/.claude/`.
+Neither of those two produces a deployed file, which is why they live in
+`.chezmoiscripts/`.
+
+**`~/.claude/` is deployed by a script rather than managed as a target.** A
+directory in the source state forces the destination to be a real directory:
+where `~/.claude` is a symlink — a Dev Container pointing at a host directory,
+say — chezmoi deletes the link and creates a directory in its place, silently,
+and the configuration is cut off from where it actually lives. There is no
+"follow the destination symlink" option to turn on, so the directory target is
+gone instead. `.chezmoiscripts/run_setup-claude-config.sh.tmpl` writes
+`bin/bell.sh` and merges `settings.json` through ordinary shell redirects,
+which follow the symlink. That script holds only the deployment logic; what it
+deploys — `bell.sh` and the `settings.json` keys this repo owns — sits in
+`.claude-payload/` as ordinary files, whose leading dot keeps chezmoi from
+treating them as source state. The `include` template function pulls them into
+the rendered script verbatim.
+
+The cost is that `chezmoi diff` and `chezmoi status` say nothing about those
+two files. The script simply rewrites them on every `chezmoi apply`, so running
+apply is the only way to see where they stand.
 
 ## Installation
 
@@ -136,8 +155,9 @@ empty directory there.
 | `dot_config/vscode/`                                         | `~/.config/vscode/`               | canonical VS Code config                              |
 | `private_Library/…/User/symlink_*`                           | `~/Library/…/Code/User/*`         | macOS paths → canonical config                        |
 | `dot_vimrc`, `dot_gitignore_global`                          | `~/.vimrc`, `~/.gitignore_global` | shared everywhere                                     |
-| `dot_claude/modify_private_settings.json`                    | `~/.claude/settings.json`         | owns `hooks`; other keys are Claude Code's own         |
-| `dot_claude/bin/executable_bell.sh`                          | `~/.claude/bin/bell.sh`           | hook body; emits OSC 777 for desktop notifications     |
+| `.chezmoiscripts/run_setup-claude-config.sh.tmpl`            | `~/.claude/{settings.json,bin/bell.sh}` | script-deployed, so a symlinked `~/.claude` survives |
+| `.claude-payload/bell.sh`                                    | via the script above              | hook body; emits OSC 777 for desktop notifications     |
+| `.claude-payload/settings.managed.json`                      | via the script above              | the keys this repo owns in `settings.json`             |
 | `.chezmoiscripts/run_onchange_install-cc-statusline.sh.tmpl` | *(script only, no target)*        | installs/updates the statusline binary                 |
 | `.chezmoiscripts/run_install-vscode-extensions.sh`           | *(script only, no target)*        | installs host VS Code extensions, `private` only       |
 

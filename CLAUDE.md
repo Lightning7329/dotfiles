@@ -22,7 +22,7 @@ Read the one that matches what you are about to touch:
 | Area                                                        | Notes                                                     |
 | ----------------------------------------------------------- | --------------------------------------------------------- |
 | Shell — `dot_zsh/`, `dot_bash/`, `modify_dot_zshrc`, `modify_dot_bashrc` | [dot_zsh/README.md](dot_zsh/README.md)         |
-| Claude Code — `settings.json` filter, notification hook     | [dot_claude/README.md](dot_claude/README.md)               |
+| Claude Code — `settings.json` filter, notification hook     | [.claude-payload/README.md](.claude-payload/README.md)     |
 | Git — identity, XDG split, platform overrides               | [dot_config/git/README.md](dot_config/git/README.md)       |
 | VS Code — canonical config, macOS symlinks                  | [dot_config/vscode/README.md](dot_config/vscode/README.md) |
 
@@ -94,21 +94,39 @@ for the per-directory notes.
 **Order matters in `.chezmoi.toml.tmpl`.** The `container` test (`/.dockerenv`)
 must stay before the WSL2 test, because a Dev Container on WSL2 satisfies both.
 
+**A directory in the source state overwrites a symlink at the target.** If
+chezmoi wants a directory where the destination holds a symlink, it deletes
+the link and creates a real directory — no prompt, unlike an overwritten file.
+That is why nothing under `~/.claude/` is a chezmoi target any more; see
+[.claude-payload/README.md](.claude-payload/README.md). Before adding a source
+directory for a path a machine might symlink elsewhere, check `chezmoi diff`
+for a `deleted file mode 120…` line.
+
+Note the corollary: ignoring every entry inside a source directory does *not*
+stop the directory itself from being created. Removing the directory is the
+only way out.
+
 **Attribute order stacks in a fixed sequence — `private_` goes after
-`modify_`, not before.** The correct name is `modify_private_settings.json`.
-Get the order wrong (`private_modify_settings.json`) and chezmoi silently
+`modify_`, not before** (`modify_private_settings.json`, never
+`private_modify_settings.json`). Get the order wrong and chezmoi silently
 stops treating the file as a script: it reads as a literal filename instead,
 `chezmoi diff` shows a bogus new file being created rather than a diff against
-the real target, and the `private_` permissions (0600) are lost. Verify any
-new multi-attribute file name with `chezmoi diff` before trusting it.
+the real target, and the `private_` permissions (0600) are lost. No file in
+the repository stacks attributes today, so verify any new multi-attribute name
+with `chezmoi diff` before trusting it.
 
 **A `run_` script under `.chezmoiscripts/` doesn't correspond to a target
 file.** `chezmoi diff` renders it as though a file will be created at that
 path, but nothing is actually written there — the path is only a bookkeeping
 key for `run_once_`/`run_onchange_` change-detection and for ordering. Reading
 that diff as a real deployment is the mistake; keep such scripts in
-`.chezmoiscripts/` rather than under `dot_claude/` or any other `dot_*`
-directory, where everything else really is deployed.
+`.chezmoiscripts/` rather than under any `dot_*` directory, where everything
+else really is deployed.
+
+**A source entry whose name begins with `.` is not source state at all**
+(except `.chezmoi*`). `.claude-payload/` uses that to hold files a script
+reads with `include` without their becoming targets. It is also why
+`.chezmoiignore` says nothing about that directory.
 
 ## Commit messages
 

@@ -1,0 +1,71 @@
+#!/bin/sh
+set -eu
+
+# ~/.claude/ の中身を配る。配る中身そのものは .claude-payload/ にあり、
+# このスクリプトは「どう配るか」だけを持つ。
+#
+#   .claude-payload/bell.sh               → ~/.claude/bin/bell.sh
+#   .claude-payload/settings.managed.json → ~/.claude/settings.json にマージ
+#
+# なぜ chezmoi のターゲット (dot_claude/) ではなくスクリプトなのか:
+# chezmoi はソース側にディレクトリがあると宛先にも実ディレクトリを要求し、
+# そこが symlink だった場合は無言で削除して実ディレクトリに置き換える
+# (ファイルと違って変更検知のプロンプトは出ない)。Dev Container のように
+# ~/.claude をホスト側ディレクトリへの symlink にしている環境では、これで
+# 設定がリンク先ごと切り離される。詳細は .claude-payload/README.md。
+#
+# run_once_ でも run_onchange_ でもなく毎回走る run_ にしてある。settings.json
+# のマージはもともと modify_ スクリプトとして apply のたびに走っていたもので、
+# Claude Code 自身が hooks を書き換えても次の apply で戻せることに意味がある。
+#
+# .chezmoiscripts/ 内の実行順は名前順。install-cc-statusline.sh (statusLine キーを
+# 自前で書き換える) より後に来るよう setup- で始めている。
+
+claude_dir=$HOME/.claude
+
+# mkdir -p も以降のリダイレクトも symlink を辿るので、~/.claude が symlink でも
+# リンクはそのまま残り、書き込みはリンク先に届く。
+mkdir -p "$claude_dir/bin"
+
+# include はソースディレクトリ相対でファイルを literal に読む (includeTemplate と
+# 違ってテンプレート展開はしない)。区切りをクォートしたヒアドキュメントなので、
+# $HOME や $(...) も展開されずそのまま bell.sh に書き出される。
+cat >"$claude_dir/bin/bell.sh" <<'__CHEZMOI_BELL_SH__'
+{{ include ".claude-payload/bell.sh" | trimSuffix "\n" }}
+__CHEZMOI_BELL_SH__
+chmod 755 "$claude_dir/bin/bell.sh"
+
+# settings.json のうちこのリポジトリが所有するのは settings.managed.json に
+# 書いたキーだけで、残りは素通りする。大半は `*` マージで足しているが、hooks は
+# 代入 (マージだとソースから消したキーがターゲットに残り続けるため)。
+# 何を入れてよいかの判断軸は .claude-payload/README.md 参照。
+
+# jq が無い環境では管理を諦める。install.sh は chezmoi しか入れないので、
+# jq を持たないコンテナは普通にありうる。
+if ! command -v jq >/dev/null 2>&1; then
+  echo "警告: jq が無いので ~/.claude/settings.json の管理をスキップします" >&2
+  exit 0
+fi
+
+managed=$(
+  cat <<'__CHEZMOI_MANAGED_JSON__'
+{{ include ".claude-payload/settings.managed.json" | trimSuffix "\n" }}
+__CHEZMOI_MANAGED_JSON__
+)
+
+settings=$claude_dir/settings.json
+
+if [ -s "$settings" ]; then
+  # jq にファイルを直接読ませる。シェル変数を経由して echo で流すと、
+  # バックスラッシュを解釈する echo 実装 (dash や macOS の /bin/sh) が
+  # settings.json 中の `\\` や `\t` を潰して jq が parse error で落ちる。
+  # いったん変数に受けるのは、リダイレクトが jq より先にファイルを空にするため。
+  merged=$(jq --argjson managed "$managed" \
+    '. * $managed | .hooks = ($managed.hooks // {})' "$settings")
+else
+  merged=$managed
+fi
+
+# 追記ではなくリダイレクトで書き戻す。既存ファイルのモードはそのまま残り、
+# 新規作成なら umask 任せになる (Claude Code 自身の既定と同じ)。
+printf '%s\n' "$merged" >"$settings"
