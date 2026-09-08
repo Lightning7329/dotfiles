@@ -102,8 +102,8 @@ treating them as source state. The `include` template function pulls them into
 the rendered script verbatim.
 
 The cost is that `chezmoi diff` and `chezmoi status` say nothing about those
-two files. The script runs on every `chezmoi apply` and rewrites them only
-when the content differs, so re-running it is the way to see where they stand.
+two files. The script simply rewrites them on every `chezmoi apply`, so running
+apply is the only way to see where they stand.
 
 ## Installation
 

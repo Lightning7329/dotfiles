@@ -8,7 +8,7 @@ keeps chezmoi from picking it up as source state. The script holds only the
 
 | File                    | Becomes                                  |
 | ----------------------- | ---------------------------------------- |
-| `bell.sh`               | `~/.claude/bin/bell.sh`, forced to 755    |
+| `bell.sh`               | `~/.claude/bin/bell.sh`, mode 755         |
 | `settings.managed.json` | merged into `~/.claude/settings.json`     |
 
 The repository [README](../README.md) explains why `settings.json` is filtered
@@ -50,9 +50,11 @@ nothing, and `$HOME`, backslashes and quotes are written out as-is — which is
 what lets `settings.managed.json` carry `"$HOME/.claude/bin/bell.sh"` verbatim
 for Claude Code to expand at hook time.
 
-The flip side is that neither file gets a syntax check from chezmoi. The script
-validates `settings.managed.json` with `jq -e .` before using it, and warns and
-skips rather than writing a broken `settings.json`.
+The flip side is that neither file gets a syntax check from chezmoi. A typo in
+`settings.managed.json` surfaces as a `jq` parse error at apply time, which
+fails the script and stops `chezmoi apply` — early, since `.chezmoiscripts`
+sorts near the front of the target order. That is the intended feedback loop;
+`~/.claude/settings.json` is left untouched when it happens.
 
 ## Not every key in `~/.claude/settings.json` belongs to this repository
 
@@ -64,9 +66,10 @@ whatever the user changed interactively.
 
 ## The mode of `settings.json` is not managed
 
-`bell.sh` is forced to 755 — it is a hook body, and a lost execute bit breaks
-it silently. `settings.json` gets no mode at all: the script keeps whatever the
-existing file has, and lets `umask` decide for a new one.
+`bell.sh` gets an explicit `chmod 755`, because a hook body has to be
+executable and a fresh file would come out 644. `settings.json` gets no `chmod`
+at all — it is written with a plain redirect, which keeps the mode of an
+existing file and leaves a new one to `umask`.
 
 That is the default Claude Code itself produces. It writes `settings.json` at
 the ambient umask (0644 on a stock macOS account) and reserves 0600 for the
