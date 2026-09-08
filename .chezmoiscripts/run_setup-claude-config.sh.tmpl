@@ -36,8 +36,9 @@ __CHEZMOI_BELL_SH__
 chmod 755 "$claude_dir/bin/bell.sh"
 
 # settings.json のうちこのリポジトリが所有するのは settings.managed.json に
-# 書いたキーだけ。何を managed に入れてよいか、なぜ hooks だけマージではなく
-# 代入なのか、Notification の matcher の選び方は .claude-payload/README.md 参照。
+# 書いたキーだけで、残りは素通りする。大半は `*` マージで足しているが、hooks は
+# 代入 (マージだとソースから消したキーがターゲットに残り続けるため)。
+# 何を入れてよいかの判断軸は .claude-payload/README.md 参照。
 
 # jq が無い環境では管理を諦める。install.sh は chezmoi しか入れないので、
 # jq を持たないコンテナは普通にありうる。

@@ -53,8 +53,9 @@ then the OS-specific file that overrides it.
 rewritten by Claude Code itself during normal use — model/effort-level
 switches, permission approvals, plugin state, the statusline installer.
 Managing the whole file would fight that. `.chezmoiscripts/run_setup-claude-config.sh.tmpl`
-is a filter, like the shell rc scripts above: it takes over exactly one key,
-`hooks`, and passes every other key through untouched.
+is a filter, like the shell rc scripts above: it takes over the keys listed in
+`.claude-payload/settings.managed.json` and passes every other key through
+untouched.
 
 `hooks` is *replaced* rather than merged, which is a deliberate trade. Merging
 can add and override but never remove, so a hook deleted from the source would
@@ -156,7 +157,7 @@ empty directory there.
 | `dot_vimrc`, `dot_gitignore_global`                          | `~/.vimrc`, `~/.gitignore_global` | shared everywhere                                     |
 | `.chezmoiscripts/run_setup-claude-config.sh.tmpl`            | `~/.claude/{settings.json,bin/bell.sh}` | script-deployed, so a symlinked `~/.claude` survives |
 | `.claude-payload/bell.sh`                                    | via the script above              | hook body; emits OSC 777 for desktop notifications     |
-| `.claude-payload/settings.managed.json`                      | via the script above              | the keys this repo owns in `settings.json` — `hooks`   |
+| `.claude-payload/settings.managed.json`                      | via the script above              | the keys this repo owns in `settings.json`             |
 | `.chezmoiscripts/run_onchange_install-cc-statusline.sh.tmpl` | *(script only, no target)*        | installs/updates the statusline binary                 |
 | `.chezmoiscripts/run_install-vscode-extensions.sh`           | *(script only, no target)*        | installs host VS Code extensions, `private` only       |
 

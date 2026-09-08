@@ -59,10 +59,16 @@ sorts near the front of the target order. That is the intended feedback loop;
 ## Not every key in `~/.claude/settings.json` belongs to this repository
 
 Claude Code rewrites the file itself during normal use (`/model`, `/fast`,
-`/hooks`, plugin state, permission approvals, the statusline installer). Before
-adding a key to `settings.managed.json`, check whether Claude Code ever writes
-it; if so, leave it out, or the next `chezmoi apply` will silently revert
-whatever the user changed interactively.
+`/hooks`, `/config`, plugin state, permission approvals, the statusline
+installer). Before adding a key to `settings.managed.json`, ask whether
+`chezmoi apply` should win over whatever was set interactively — because it
+will, silently, on the next run.
+
+For a key that gets switched per session or per machine, the answer is no:
+`model`, `effortLevel`, `statusLine`, `permissions.allow`, `enabledPlugins`
+and `extraKnownMarketplaces` are all left out for that reason. For a key that
+should be the same everywhere and stay that way, apply winning is the whole
+point — `language` is managed precisely so it cannot drift.
 
 ## The mode of `settings.json` is not managed
 
@@ -103,12 +109,13 @@ same event; `auth_success`, `elicitation_complete`, `elicitation_response` and
 ## `jq`'s `*` merge can add and override, but never remove
 
 It merges recursively, so a key deleted from `settings.managed.json` would live
-on in the target forever. Any key whose deletions have to take effect must be
-assigned the way `hooks` is (`.hooks = ($managed.hooks // {})`) instead of
-being left to the merge; the `// {}` keeps a bare `null` out of the target when
-`settings.managed.json` has no `hooks` at all. Today `hooks` is the only key in
-that file, so the merge itself is idling — the structure is there for when a
-second key arrives.
+on in the target forever. Most keys are fine with that — dropping `language`
+from the source and having the old value linger until you clear it by hand is
+survivable. `hooks` is not, which is why it is assigned
+(`.hooks = ($managed.hooks // {})`) instead of being left to the merge; the
+`// {}` keeps a bare `null` out of the target when `settings.managed.json` has
+no `hooks` at all. Any key that later needs the same guarantee has to be
+assigned the same way.
 
 ## Never pipe JSON through `echo`
 
