@@ -30,19 +30,30 @@ claude_dir=$HOME/.claude
 mkdir -p "$claude_dir/bin"
 
 # 内容が変わったときだけ置き換える。毎回上書きすると mtime だけが動く。
-# 引数: <出力先> <パーミッション>。中身は標準入力から。
+# 引数: <出力先> [強制するモード]。中身は標準入力から。
+# モードを省くと既存ファイルのモードを引き継ぐ (新規作成時は umask 任せ)。
 install_if_changed() {
   dest=$1
-  mode=$2
+  mode=${2-}
   tmp=$dest.chezmoi-tmp
-  (
-    umask 077
-    cat >"$tmp"
-  )
-  chmod "$mode" "$tmp"
+  rm -f "$tmp"
+  if [ -f "$dest" ]; then
+    # 中身は次の行で捨てる。モード (と可能ならオーナー) を引き継ぐための下敷き。
+    cp -p "$dest" "$tmp"
+  fi
+  cat >"$tmp"
+  if [ -n "$mode" ]; then
+    chmod "$mode" "$tmp"
+  fi
   if [ -f "$dest" ] && cmp -s "$tmp" "$dest"; then
     rm -f "$tmp"
+    # 内容が同じでもモードは表明する。書いたときしか chmod しないと、
+    # 誰かが実行ビットを落とした bell.sh がそのまま放置される。
+    if [ -n "$mode" ]; then
+      chmod "$mode" "$dest"
+    fi
   else
+    # mv なので置き換えは不可分。実行中の bell.sh は古い inode を掴んだままになる。
     mv "$tmp" "$dest"
   fi
 }
@@ -100,5 +111,8 @@ else
   merged=$managed
 fi
 
-# パーミッション 0600 は以前 private_ 属性が担っていた分。
-printf '%s\n' "$merged" | install_if_changed "$settings" 600
+# モードは指定しない。Claude Code 自身が作る settings.json は umask 任せ (=大抵
+# 0644) で、秘密を持つファイル (history.jsonl, .claude.json, projects/) だけを
+# 0600 にしている。ここだけ 0600 を強制していたのは旧 private_ 属性の名残で、
+# 既定から外れる理由が無い。
+printf '%s\n' "$merged" | install_if_changed "$settings"

@@ -6,10 +6,10 @@ and this directory is the material it draws from — the leading dot is what
 keeps chezmoi from picking it up as source state. The script holds only the
 *how*; the *what* lives here:
 
-| File                    | Becomes                                       |
-| ----------------------- | --------------------------------------------- |
-| `bell.sh`               | `~/.claude/bin/bell.sh`, mode 755              |
-| `settings.managed.json` | merged into `~/.claude/settings.json`, mode 600 |
+| File                    | Becomes                                  |
+| ----------------------- | ---------------------------------------- |
+| `bell.sh`               | `~/.claude/bin/bell.sh`, forced to 755    |
+| `settings.managed.json` | merged into `~/.claude/settings.json`     |
 
 The repository [README](../README.md) explains why `settings.json` is filtered
 instead of managed wholesale, and why turn-completion notifications go out
@@ -61,6 +61,24 @@ Claude Code rewrites the file itself during normal use (`/model`, `/fast`,
 adding a key to `settings.managed.json`, check whether Claude Code ever writes
 it; if so, leave it out, or the next `chezmoi apply` will silently revert
 whatever the user changed interactively.
+
+## The mode of `settings.json` is not managed
+
+`bell.sh` is forced to 755 — it is a hook body, and a lost execute bit breaks
+it silently. `settings.json` gets no mode at all: the script keeps whatever the
+existing file has, and lets `umask` decide for a new one.
+
+That is the default Claude Code itself produces. It writes `settings.json` at
+the ambient umask (0644 on a stock macOS account) and reserves 0600 for the
+files that actually hold private data — `history.jsonl`, `~/.claude.json` and
+its backups, `projects/`, `sessions/`, `ide/`. This repository used to force
+0600 here, inherited from the `private_` attribute on the old
+`modify_private_settings.json`, not from a decision.
+
+The case for 0600 is that `env` and `apiKeyHelper` are documented keys where a
+credential could land. If one ever does, tighten it deliberately then — and
+note that a mode alone would not be enough, since the source file lives in a
+public repository.
 
 ## Which `Notification` matchers are listed, and why
 
