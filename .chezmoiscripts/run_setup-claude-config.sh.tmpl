@@ -1,0 +1,104 @@
+#!/bin/sh
+set -eu
+
+# ~/.claude/ の中身を配る。配る中身そのものは .claude-payload/ にあり、
+# このスクリプトは「どう配るか」だけを持つ。
+#
+#   .claude-payload/bell.sh               → ~/.claude/bin/bell.sh
+#   .claude-payload/settings.managed.json → ~/.claude/settings.json にマージ
+#
+# なぜ chezmoi のターゲット (dot_claude/) ではなくスクリプトなのか:
+# chezmoi はソース側にディレクトリがあると宛先にも実ディレクトリを要求し、
+# そこが symlink だった場合は無言で削除して実ディレクトリに置き換える
+# (ファイルと違って変更検知のプロンプトは出ない)。Dev Container のように
+# ~/.claude をホスト側ディレクトリへの symlink にしている環境では、これで
+# 設定がリンク先ごと切り離される。シェル経由の書き込みなら symlink を辿るので
+# リンク先へ届く。詳細は .claude-payload/README.md。
+#
+# run_once_ でも run_onchange_ でもなく毎回走る run_ にしてある。settings.json
+# のマージはもともと modify_ スクリプトとして apply のたびに走っていたもので、
+# Claude Code 自身が hooks を書き換えても次の apply で戻せることに意味がある。
+#
+# .chezmoiscripts/ 内の実行順は名前順。install-cc-statusline.sh (statusLine キーを
+# 自前で書き換える) より後に来るよう setup- で始めている。
+
+claude_dir=$HOME/.claude
+
+# -d は symlink を辿るので、~/.claude が実ディレクトリへの symlink ならここは
+# 素通りする。symlink はそのまま残り、以降の書き込みはリンク先に届く。
+[ -d "$claude_dir" ] || mkdir -p "$claude_dir"
+mkdir -p "$claude_dir/bin"
+
+# 内容が変わったときだけ置き換える。毎回上書きすると mtime だけが動く。
+# 引数: <出力先> <パーミッション>。中身は標準入力から。
+install_if_changed() {
+  dest=$1
+  mode=$2
+  tmp=$dest.chezmoi-tmp
+  (
+    umask 077
+    cat >"$tmp"
+  )
+  chmod "$mode" "$tmp"
+  if [ -f "$dest" ] && cmp -s "$tmp" "$dest"; then
+    rm -f "$tmp"
+  else
+    mv "$tmp" "$dest"
+  fi
+}
+
+# --- bin/bell.sh -------------------------------------------------------------
+#
+# include はソースディレクトリ相対でファイルを読み、テンプレートとしては
+# 展開しない。.claude-payload/ は先頭がドットなので chezmoi のソース状態からは
+# 除外されており、ターゲットを持たない素のファイルとして扱える。
+# ヒアドキュメントの区切りをクォートしてあるので、$HOME や $(...) はここでは
+# 展開されずそのまま bell.sh に書き出される。
+install_if_changed "$claude_dir/bin/bell.sh" 755 <<'__CHEZMOI_BELL_SH__'
+{{ include ".claude-payload/bell.sh" | trimSuffix "\n" }}
+__CHEZMOI_BELL_SH__
+
+# --- settings.json -----------------------------------------------------------
+#
+# このリポジトリが所有するのは settings.managed.json に書いたキーだけで、
+# 残りは Claude Code 自身のもの。何を managed に入れてよいか、なぜ hooks だけ
+# マージではなく代入なのか、Notification の matcher の選び方は
+# .claude-payload/README.md 参照。
+
+# jq が無い環境では管理を諦める。install.sh は chezmoi しか入れないので、
+# jq を持たないコンテナは普通にありうる。警告は出すが apply 全体は止めない。
+if ! command -v jq >/dev/null 2>&1; then
+  echo "警告: jq が無いので ~/.claude/settings.json の管理をスキップします" >&2
+  exit 0
+fi
+
+managed=$(
+  cat <<'__CHEZMOI_MANAGED_JSON__'
+{{ include ".claude-payload/settings.managed.json" | trimSuffix "\n" }}
+__CHEZMOI_MANAGED_JSON__
+)
+
+# 先に managed 側を検証しておく。まとめて jq に渡すと、壊れているのが
+# settings.managed.json なのか既存の settings.json なのか区別できない。
+if ! printf '%s\n' "$managed" | jq -e . >/dev/null 2>&1; then
+  echo "警告: .claude-payload/settings.managed.json が JSON として不正です" >&2
+  exit 0
+fi
+
+settings=$claude_dir/settings.json
+
+if [ -s "$settings" ]; then
+  # jq にファイルを直接読ませる。シェル変数を経由して echo で流すと、
+  # バックスラッシュを解釈する echo 実装 (dash や macOS の /bin/sh) が
+  # settings.json 中の `\\` や `\t` を潰して jq が parse error で落ちる。
+  if ! merged=$(jq --argjson managed "$managed" \
+    '. * $managed | .hooks = ($managed.hooks // {})' "$settings"); then
+    echo "警告: $settings を解釈できなかったので更新を見送ります" >&2
+    exit 0
+  fi
+else
+  merged=$managed
+fi
+
+# パーミッション 0600 は以前 private_ 属性が担っていた分。
+printf '%s\n' "$merged" | install_if_changed "$settings" 600
