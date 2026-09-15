@@ -45,6 +45,8 @@
         "codeOutput": true
     },
     "notebook.stickyScroll.enabled": true,
+    // MARK: Markdown
+    "markdown.experimental.richLinks.enabled": true,
     // MARK: Git
     "git.autofetch": true,
     "git.closeDiffOnOperation": true,
@@ -64,6 +66,23 @@
     },
     "chat.mcp.gallery.enabled": true,
     "chat.viewSessions.orientation": "stacked",
+    "chat.tools.terminal.terminalProfile.linux": {
+        "path": "bash",
+        "env": {
+            "PAGER": "cat",
+            "GIT_PAGER": "cat",
+        },
+        "icon": "copilot",
+    },
+    "chat.tools.terminal.terminalProfile.osx": {
+        "path": "bash",
+        "env": {
+            "PAGER": "cat",
+            "GIT_PAGER": "cat",
+        },
+        "icon": "copilot",
+    },
+    "chat.experimental.richLinks.enabled": true,
     "claudeCode.preferredLocation": "panel",
     // MARK: Workbench
     "workbench.settings.editor": "json",
@@ -107,6 +126,9 @@
     },
     "workbench.secondarySideBar.showLabels": false,
     "workbench.experimental.modernUI": false,
+    "workbench.editor.customLabels.patterns": {
+        "**/skills/*/SKILL.md": "${dirname}/${filename}.md",
+    },
     "breadcrumbs.enabled": true,
     // MARK: Editor
     "editor.minimap.showSlider": "always",
@@ -154,6 +176,13 @@
         "WORKSPACE_FOLDER": "${workspaceFolder}",
         "PAGER": "less",
         "LESS": "FRX",
+        "LESSCHARSET": "utf-8",
+    },
+    "terminal.integrated.env.linux": {
+        "WORKSPACE_FOLDER": "${workspaceFolder}",
+        "PAGER": "less",
+        "LESS": "FRX",
+        "LESSCHARSET": "utf-8",
     },
     "terminal.integrated.shellIntegration.enabled": true,
     "terminal.integrated.suggest.enabled": true,
