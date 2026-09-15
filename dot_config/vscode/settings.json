@@ -20,9 +20,6 @@
     "[python]": {
         "editor.formatOnType": true,
     },
-    "python.analysis.extraPaths": [
-        "/Users/trevelyan1103/Documents/Programming/Python/WebScraping/public_facility_scraping"
-    ],
     "python.analysis.autoFormatStrings": true,
     "python.analysis.autoImportCompletions": true,
     "python.terminal.shellIntegration.enabled": true,
@@ -49,13 +46,6 @@
     },
     "notebook.stickyScroll.enabled": true,
     // MARK: Git
-    "github.copilot.nextEditSuggestions.enabled": true,
-    "github.copilot.enable": {
-        "*": true,
-        "plaintext": false,
-        "markdown": true,
-        "scminput": false
-    },
     "git.autofetch": true,
     "git.closeDiffOnOperation": true,
     "git.enableSmartCommit": false,
@@ -64,6 +54,14 @@
     "git.blame.statusBarItem.enabled": true,
     "git-log--graph.row-height": 25,
     "scm.defaultViewMode": "tree",
+    // MARK: GitHub Copilot, Claude Code
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+        "scminput": false
+    },
     "chat.mcp.gallery.enabled": true,
     "chat.viewSessions.orientation": "stacked",
     "claudeCode.preferredLocation": "panel",
@@ -109,6 +107,7 @@
     },
     "workbench.secondarySideBar.showLabels": false,
     "workbench.experimental.modernUI": false,
+    "breadcrumbs.enabled": true,
     // MARK: Editor
     "editor.minimap.showSlider": "always",
     "editor.minimap.renderCharacters": true,
@@ -426,7 +425,6 @@
     "markdown-preview-enhanced.scrollSync": false,
     "vscode-json-editor.theme": "dark",
     "redhat.telemetry.enabled": true,
-    "breadcrumbs.enabled": true,
     "aws.suppressPrompts": {
         "regionAddAutomatically": true,
     },
@@ -542,7 +540,6 @@
         ".git/objects",
         ".vscode",
         ".vscode-insiders",
-        "/Users/trevelyan1103/Library/Application Support/Code/User/settings.json",
     ],
     "toggleboolean.mapping": {
         "true": false,
@@ -555,15 +552,5 @@
         "off": "on",
         "enabled": "disabled",
         "disabled": "enabled",
-    },
-    "sonarlint.rules": {
-        // Rename this local variable "Segment" to match the regular expression ^[_a-z][a-z0-9_]*$.
-        "python:S117": {
-            "level": "off"
-        },
-        // Complete the task associated to this "TODO" comment.
-        "python:S1135": {
-            "level": "off"
-        },
     },
 }
